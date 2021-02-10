@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } fr
 import { Avatar } from 'react-native-elements';
 import { AntDesign, SimpleLineIcons } from '@expo/vector-icons';
 import CustomListItem from '../components/customListItem';
+import { StatusBar } from 'expo-status-bar';
 
 import { auth, db } from '../../firebase';
 
@@ -52,11 +53,19 @@ const HomeScreen = ({ navigation }) => {
     })
   }, [])
 
+  const enterChat = (id, chatName) => {
+    navigation.navigate('Chat', {
+      id,
+      chatName
+    })
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
+    <SafeAreaView>
+       <StatusBar style='dark' />
+      <ScrollView style={styles.container}>
         {chats.map(({ id, data: { chatName } }) => (
-          <CustomListItem key={id} id={id} chatName={chatName} />
+          <CustomListItem enterChat={() => enterChat(id, chatName)} key={id} id={id} chatName={chatName} />
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -67,6 +76,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: '100%'
   }
 })
