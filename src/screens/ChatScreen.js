@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState, useRef } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, SafeAreaView, TextInput, KeyboardAvoidingView, Platform, ScrollView, Keyboard } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,8 @@ import { db, auth } from '../../firebase';
 
 const ChatScreen = ({ navigation, route }) => {
   const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([]);
+  const scrollViewRef = useRef();
 
   const sendMessage = () => {
     Keyboard.dismiss();
@@ -26,6 +28,18 @@ const ChatScreen = ({ navigation, route }) => {
   }
 
   useLayoutEffect(() => {
+    const unsubscribe = db.collection('chats').doc(route.params.id)
+      .collection('messages').orderBy('timestamp', 'asc').onSnapshot(snapshot => setMessages(
+        snapshot.docs.map(doc => ({
+          id: doc.id,
+          data: doc.data()
+        }))
+      ))
+
+    return unsubscribe;
+  }, [route])
+
+  useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Chat',
       headerTitleAlign: 'left',
@@ -34,7 +48,7 @@ const ChatScreen = ({ navigation, route }) => {
           flexDirection: 'row',
           alignItems: 'center'
         }}>
-          <Avatar rounded source={{ uri: 'https://placebeard.it/360x360' }} />
+          <Avatar rounded source={{ uri: messages[0]?.data?.photoURL || 'https://placebeard.it/360x360' }} />
           <Text style={{ color: '#fff', marginLeft: 10, fontWeight: '700' }}>{route.params.chatName}</Text>
         </View>
       ),
@@ -64,7 +78,7 @@ const ChatScreen = ({ navigation, route }) => {
         </View>
       )
     })
-  }, [navigation])
+  }, [navigation, messages])
 
   return (
     <SafeAreaView>
@@ -75,11 +89,48 @@ const ChatScreen = ({ navigation, route }) => {
         style={styles.container}
       >
         <>
-          <ScrollView>
-            <Text>chat goes here</Text>
+          <ScrollView
+            ref={scrollViewRef}
+            onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
+            contentContainerStyle={{ paddingTop: 10 }} >
+            {
+              messages.map(({ id, data }) => (
+                data.email == auth.currentUser.email ? (
+                  <View key={id} style={styles.receiver} >
+                    <Avatar
+                      position='absolute'
+                      rounded
+                      bottom={-15}
+                      right={-5}
+                      size={24}
+                      source={{
+                        uri: data.photoURL
+                      }}
+                    />
+                    <Text style={styles.receiverText}>{data.message}</Text>
+                  </View>
+                ) : (
+                    <View key={id} style={styles.sender}>
+                      <Avatar
+                        position='absolute'
+                        rounded
+                        bottom={-15}
+                        right={-5}
+                        size={24}
+                        source={{
+                          uri: data.photoURL
+                        }}
+                      />
+                      <Text style={styles.senderText}>{data.message}</Text>
+                      <Text style={styles.senderName}>{data.displayName}</Text>
+                    </View>
+                  )
+              ))
+            }
           </ScrollView>
           <View style={styles.footer}>
             <TextInput
+              value={input}
               onChangeText={text => setInput(text)}
               style={styles.textInput}
               placeholder='Type something here'
@@ -119,5 +170,47 @@ const styles = StyleSheet.create({
     padding: 10,
     color: 'grey',
     borderRadius: 30
+  },
+
+  receiver: {
+    padding: 15,
+    backgroundColor: '#ececec',
+    alignSelf: 'flex-end',
+    borderRadius: 20,
+    marginRight: 10,
+    marginBottom: 20,
+    maxWidth: '80%',
+    position: 'relative'
+  },
+
+  sender: {
+    padding: 15,
+    backgroundColor: '#2b68e6',
+    alignSelf: 'flex-start',
+    borderRadius: 20,
+    marginLeft: 10,
+    marginBottom: 20,
+    maxWidth: '80%',
+    position: 'relative'
+  },
+
+  senderName: {
+    left: 10,
+    paddingRight: 10,
+    fontSize: 10,
+    color: '#fff'
+  },
+
+  senderText: {
+    color: '#fff',
+    fontWeight: '500',
+    marginLeft: 10,
+    marginBottom: 15
+  },
+
+  receiverText: {
+    color: 'black',
+    fontWeight: '500',
+    marginLeft: 10
   }
 })
