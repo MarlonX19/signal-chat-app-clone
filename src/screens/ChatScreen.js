@@ -24,6 +24,11 @@ const ChatScreen = ({ navigation, route }) => {
       photoURL: auth.currentUser.photoURL
     })
 
+    db.collection('chats').doc(route.params.id).update({
+      mostRecentMessage: Date.now()
+    })
+
+
     setInput('');
   }
 

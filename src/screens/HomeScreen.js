@@ -12,10 +12,21 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const unsubscribe = db.collection('chats').onSnapshot(snapshot => {
-      setChats(snapshot.docs.map(doc => ({
+      let temp = [];
+      temp = snapshot.docs.map(doc => ({
         id: doc.id,
         data: doc.data()
-      })))
+      }))
+      temp.sort((a, b) => {
+        if (a.data.mostRecentMessage < b.data.mostRecentMessage) {
+          return 1;
+        }
+        if (a.data.mostRecentMessage > b.data.mostRecentMessage) {
+          return -1;
+        }
+        return 0;
+      })
+      setChats(temp)
     })
 
     return unsubscribe;
@@ -62,10 +73,10 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView>
-       <StatusBar style='dark' />
+      <StatusBar style='dark' />
       <ScrollView style={styles.container}>
-        {chats.map(({ id, data: { chatName } }) => (
-          <CustomListItem enterChat={() => enterChat(id, chatName)} key={id} id={id} chatName={chatName} />
+        {chats.map(({ id, data: { chatName, mostRecentMessage } }) => (
+          <CustomListItem mostRecentMessage={mostRecentMessage} enterChat={() => enterChat(id, chatName)} key={id} id={id} chatName={chatName} />
         ))}
       </ScrollView>
     </SafeAreaView>

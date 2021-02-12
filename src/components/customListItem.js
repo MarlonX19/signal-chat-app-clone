@@ -5,8 +5,15 @@ import { ListItem, Avatar } from 'react-native-elements';
 import { db, auth } from '../../firebase';
 
 
-const CustomListItem = ({ id, chatName, enterChat }) => {
+const CustomListItem = ({ id, chatName, enterChat, mostRecentMessage }) => {
   const [chatMessages, setChatMessages] = useState([]);
+  let test = new Date(mostRecentMessage);
+  let res = `${test.toLocaleDateString()} ${test.toLocaleTimeString()}`;
+
+  console.log('========mostRecentMessage');
+  console.log(res)
+
+
 
   useEffect(() => {
     const unsubscribe = db.collection('chats').doc(id).collection('messages')
@@ -14,21 +21,25 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
         setChatMessages(snapshot.docs.map(doc => doc.data()))
       ))
 
-      return unsubscribe;
+    return unsubscribe;
   }, [])
 
   return (
     <ListItem key={id} onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
       <Avatar
+        size={50}
         rounded
         source={{
           uri: chatMessages?.[0]?.photoURL || 'https://placebeard.it/360x360'
         }}
       />
       <ListItem.Content>
-        <ListItem.Title style={{ fontWeight: '800' }} >
-          {chatName}
-        </ListItem.Title>
+        <View style={styles.listItemTop}>
+          <ListItem.Title style={{ fontWeight: '800' }} >
+            {chatName}
+          </ListItem.Title>
+          <Text style={styles.listItemLastMessage}>{res}</Text>
+        </View>
         <ListItem.Subtitle numberOfLines={1} ellipsizeMode='tail'>
           {chatMessages?.[0]?.displayName}: {chatMessages?.[0]?.message}
         </ListItem.Subtitle>
@@ -40,5 +51,15 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
 export default CustomListItem;
 
 const styles = StyleSheet.create({
+  listItemTop: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
 
+  listItemLastMessage: {
+    color: '#696969',
+    fontSize: 10
+  }
 })
