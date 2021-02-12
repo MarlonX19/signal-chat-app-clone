@@ -25,7 +25,7 @@ const RegisterScreen = ({ navigation }) => {
       .then((authUser) => {
         authUser.user.updateProfile({
           displayName: name,
-          photoURL: imageUrl || 'https://thispersondoesnotexist.com/'
+          photoURL: imageUrl || 'https://placebeard.it/360x360'
         })
       }).catch(error => Alert.alert(error.message))
   }
