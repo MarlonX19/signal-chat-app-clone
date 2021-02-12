@@ -1,14 +1,24 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Vibration } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { AntDesign, SimpleLineIcons } from '@expo/vector-icons';
 import CustomListItem from '../components/customListItem';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native'
 
 import { auth, db } from '../../firebase';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
   const [chats, setChats] = useState([]);
+
+  console.log('======route name');
+  const nav = useNavigation();
+  const { dangerouslyGetState } = useNavigation();
+  const { index, routes } = dangerouslyGetState()
+  console.log('=========routes[index].name========');
+  console.log(routes[index].name);
+
+
 
   useEffect(() => {
     const unsubscribe = db.collection('chats').onSnapshot(snapshot => {
@@ -31,6 +41,12 @@ const HomeScreen = ({ navigation }) => {
 
     return unsubscribe;
   }, [])
+
+  useEffect(() => {
+    if (chats.length > 0 && routes[index].name != 'Chat') {
+      Vibration.vibrate();
+    }
+  }, [chats])
 
   const signOut = () => {
     auth.signOut().then(() => {

@@ -10,10 +10,6 @@ const CustomListItem = ({ id, chatName, enterChat, mostRecentMessage }) => {
   let test = new Date(mostRecentMessage);
   let res = `${test.toLocaleDateString()} ${test.toLocaleTimeString()}`;
 
-  console.log('========mostRecentMessage');
-  console.log(res)
-
-
 
   useEffect(() => {
     const unsubscribe = db.collection('chats').doc(id).collection('messages')

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, SafeAreaView, TextInput, KeyboardAvoidingView, Platform, ScrollView, Keyboard } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
