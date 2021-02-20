@@ -11,14 +11,9 @@ import { auth, db } from '../../firebase';
 const HomeScreen = ({ navigation, route }) => {
   const [chats, setChats] = useState([]);
 
-  console.log('======route name');
   const nav = useNavigation();
   const { dangerouslyGetState } = useNavigation();
   const { index, routes } = dangerouslyGetState()
-  console.log('=========routes[index].name========');
-  console.log(routes[index].name);
-
-
 
   useEffect(() => {
     const unsubscribe = db.collection('chats').onSnapshot(snapshot => {
