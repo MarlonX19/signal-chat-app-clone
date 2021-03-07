@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Alert, Platform, Image, TouchableOpacity } from 'react-native';
 import { Input, Button, Text } from 'react-native-elements';
 import { StatusBar } from 'expo-status-bar';
@@ -17,6 +17,8 @@ const RegisterScreen = ({ navigation }) => {
   const [downloadUrl, setDownloadUrl] = useState('');
   const [progress, setProgress] = useState(0);
   const [imageId, setImageId] = useState('');
+
+  const imageProgress = useRef(0);
 
   useEffect(() => {
     (async () => {
@@ -52,6 +54,7 @@ const RegisterScreen = ({ navigation }) => {
       .then((authUser) => {
         authUser.user.updateProfile({
           displayName: name,
+          phoneNumber: "19988764573",
           photoURL: downloadUrl || 'https://placebeard.it/360x360'
         })
       }).catch(error => Alert.alert(error.message))
@@ -79,25 +82,25 @@ const RegisterScreen = ({ navigation }) => {
   }
 
   const uploadImage = async (uri) => {
-    console.log("=====uri da imagem aqui=======", uri);
-    console.log(uri);
-    var currentUserId = 'test';
+    var currentUserId = 'user';
 
     const response = await fetch(uri);
-    const blob = await response.blob()
-    var filePath = imageId // + '.' + currentFileType
+    const blob = await response.blob();
+    var filePath = String(Date.now()); // + '.' + currentFileType
 
-    var uploadTask = storage.ref('user').child(filePath).put(blob)
+    var uploadTask = storage.ref(currentUserId).child(filePath).put(blob)
 
     uploadTask.on('state_changed', function (snapshot) {
       var progress = ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(0);
       setProgress(progress)
+      imageProgress.current = progress;
     }, function (error) {
       console.log('error======', error)
     }, function () {
-      setProgress(100)
+      imageProgress.current = 100;
       uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
         setDownloadUrl(downloadURL);
+        setImageUrl('');
       })
 
     })
@@ -133,14 +136,41 @@ const RegisterScreen = ({ navigation }) => {
           onChangeText={(text) => setPassword(text)}
         />
         <TouchableOpacity onPress={choosePhoto}>
-          <Image
-            source={{
-              uri: downloadUrl
-                ||
-                'https://static.thenounproject.com/png/182919-200.png'
-            }}
-            style={{ alignSelf: "center", width: 100, height: 100 }}
-          />
+          {
+            imageUrl ? (
+              <>
+                <View
+                  style={{
+                    backgroundColor: "rgba(170,170,170,0.7)",
+                    zIndex: 10,
+                    position: 'relative',
+                    width: 100, height: 100,
+                    alignSelf: 'center'
+                  }}
+                >
+                </View>
+                <View style={{ position: 'absolute', zIndex: 11, top: 34, alignSelf: 'center' }}>
+                  <Text style={{ color: '#ddd', fontSize: 16 }}>{imageProgress.current}%</Text>
+                </View>
+                <Image
+                  source={{
+                    uri: imageUrl
+                  }}
+                  style={{ position: 'absolute', zIndex: 9, alignSelf: "center", width: 100, height: 100 }}
+                />
+              </>
+            ) : (
+                <Image
+                  source={{
+                    uri: downloadUrl
+                      ||
+                      'https://static.thenounproject.com/png/182919-200.png'
+                  }}
+                  style={{ alignSelf: "center", width: 100, height: 100 }}
+                />
+              )
+          }
+
         </TouchableOpacity>
       </View>
       <Button
