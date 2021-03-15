@@ -1,29 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, StyleSheet, Text, KeyboardAvoidingView } from 'react-native';
 import { Input, Image, Button } from 'react-native-elements';
 import { StatusBar } from 'expo-status-bar';
 
-import { auth } from '../../firebase';
+import { AuthContext } from '../contexts/authContext';
+import { useAuth } from '../hooks';
 
 const LoginScreen = ({ navigation }) => {
+  const { handleSignIn } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  useEffect(()=>{
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      if(authUser){
-        navigation.replace('Home')
-      }
-    })
 
-    return unsubscribe;
-  }, [])
-
-
-  const signIn = () => {
-    auth.signInWithEmailAndPassword(email, password).catch(error => {
-      alert(error.message)
-    })
+  function Entrar() {
+    handleSignIn('marlon@email.com', '123456');
   }
 
   const signUp = () => {
@@ -47,10 +37,9 @@ const LoginScreen = ({ navigation }) => {
           type='password'
           value={password}
           onChangeText={txt => setPassword(txt)}
-          onSubmitEditing={signIn}
         />
       </View>
-      <Button containerStyle={styles.button} onPress={signIn} title='Login' />
+      <Button containerStyle={styles.button} onPress={() => Entrar()} title='Login' />
       <Button containerStyle={styles.button} onPress={() => navigation.navigate('Register')} type='outline' title='Register' />
       <View style={{ height: 100 }} />
     </KeyboardAvoidingView>
