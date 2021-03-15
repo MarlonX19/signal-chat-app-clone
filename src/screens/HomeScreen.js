@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native'
 
 import { auth, db } from '../../firebase';
+import {useAuth } from '../hooks';
 
 const HomeScreen = ({ navigation, route }) => {
   const [chats, setChats] = useState([]);
@@ -14,6 +15,8 @@ const HomeScreen = ({ navigation, route }) => {
   const nav = useNavigation();
   const { dangerouslyGetState } = useNavigation();
   const { index, routes } = dangerouslyGetState()
+
+  const { handleSignOut } = useAuth();
 
   useEffect(() => {
     const unsubscribe = db.collection('chats').onSnapshot(snapshot => {
@@ -44,9 +47,7 @@ const HomeScreen = ({ navigation, route }) => {
   }, [chats])
 
   const signOut = () => {
-    auth.signOut().then(() => {
-      navigation.replace('Login')
-    })
+    handleSignOut();
   }
 
   useLayoutEffect(() => {
