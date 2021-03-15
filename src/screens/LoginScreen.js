@@ -1,23 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Text, KeyboardAvoidingView } from 'react-native';
 import { Input, Image, Button } from 'react-native-elements';
 import { StatusBar } from 'expo-status-bar';
 
-import { AuthContext } from '../contexts/authContext';
 import { useAuth } from '../hooks';
 
 const LoginScreen = ({ navigation }) => {
-  const { handleSignIn } = useContext(AuthContext);
+  const { handleSignIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-
-  function Entrar() {
-    handleSignIn('marlon@email.com', '123456');
-  }
-
-  const signUp = () => {
-
+  function SignIn() {
+    handleSignIn(email, password);
   }
 
   return (
@@ -39,7 +33,7 @@ const LoginScreen = ({ navigation }) => {
           onChangeText={txt => setPassword(txt)}
         />
       </View>
-      <Button containerStyle={styles.button} onPress={() => Entrar()} title='Login' />
+      <Button containerStyle={styles.button} onPress={() => SignIn()} title='Login' />
       <Button containerStyle={styles.button} onPress={() => navigation.navigate('Register')} type='outline' title='Register' />
       <View style={{ height: 100 }} />
     </KeyboardAvoidingView>

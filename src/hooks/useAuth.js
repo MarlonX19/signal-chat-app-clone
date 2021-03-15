@@ -4,9 +4,9 @@ import { AuthContext } from '../contexts/authContext';
 
 
 function useAuth() {
-  const { logged } = useContext(AuthContext);
+  const { logged, handleSignIn, handleSignOut } = useContext(AuthContext);
 
-  return { logged }
+  return { logged, handleSignIn, handleSignOut }
 }
 
 export default useAuth;
