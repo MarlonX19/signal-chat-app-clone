@@ -56,7 +56,7 @@ const UserScreen = ({ navigation, route }) => {
 
   const uploadImage = async (uri) => {
     setUpdatingPhoto(true);
-    var currentUserId = 'user';
+    var currentUserId = 'user'; //sample userID
 
     const response = await fetch(uri);
     const blob = await response.blob();
