@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import HomeScreen from "./HomeScreen";
 import AddChatScreen from "./AddChatScreen";
-import ChatScreen from "./AddChatScreen";
+import ChatScreen from "./ChatScreen";
 import UserScreen from "./UserDetailScreen";
 
 const Stack = createStackNavigator();
